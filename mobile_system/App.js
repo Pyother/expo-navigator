@@ -1,10 +1,11 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Platform, StatusBar } from 'react-native';
 
 // * Own components
 import { Header } from './components/Header.jsx';
+
  
 export default function App() {
+
   return (
     <View style={styles.container}>
         <Header />
@@ -18,7 +19,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: Platform.OS === 'android' ? 0 : 20,
   },
 });
 
