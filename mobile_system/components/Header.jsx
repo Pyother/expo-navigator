@@ -12,10 +12,10 @@ export const Header = () => {
         <View style={styles.headerStyle}>
             <View style={styles.leftContainerStyle}>
                 <Text style={styles.titleStyle}>
-                    RTLS SYSTEMS
+                    Panel obsługi
                 </Text>
                 <Text style={styles.subtitleStyle}>
-                    by Piotr Sobol
+                    robota mobilnego
                 </Text>
             </View>
             <View style={styles.rightContainerStyle}>

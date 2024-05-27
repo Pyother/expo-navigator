@@ -16,10 +16,22 @@ MqttClient mqttClient(wifiClient);
 // ↓ Global variables:
 int status = WL_IDLE_STATUS; // → status of connection.
 
+// ↓ Input/Output:
+#define ENGINE1_BACKWARD A0
+#define ENGINE1_FORWARD A1
+#define ENGINE2_BACKWARD A2
+#define ENGINE2_FORWARD A3
+
 void setup()
 {
 
   Serial.begin(9600);
+
+  // ↓ Setting up input/output pins.
+  pinMode(ENGINE1_FORWARD, OUTPUT);
+  pinMode(ENGINE1_BACKWARD, OUTPUT);
+  pinMode(ENGINE2_FORWARD, OUTPUT);
+  pinMode(ENGINE2_BACKWARD, OUTPUT);
 
   // =======================================================
   // ↓ Connection loop.
@@ -96,6 +108,17 @@ void change_position(int position)
   if (position)
   {
     Serial.println("Positive");
+    digitalWrite(ENGINE1_FORWARD, HIGH);
+    digitalWrite(ENGINE1_BACKWARD, LOW);
+    digitalWrite(ENGINE2_FORWARD, HIGH);
+    digitalWrite(ENGINE2_BACKWARD, LOW);
+
+    delay(1000);
+
+    digitalWrite(ENGINE1_FORWARD, LOW);
+    digitalWrite(ENGINE1_BACKWARD, LOW);
+    digitalWrite(ENGINE2_FORWARD, LOW);
+    digitalWrite(ENGINE2_BACKWARD, LOW);
   }
   else
   {

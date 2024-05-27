@@ -1,16 +1,25 @@
-import { StyleSheet, Text, View, Platform, StatusBar } from 'react-native';
+// * React and React Native imports:
+import { StyleSheet, Text, Platform, StatusBar } from 'react-native';
 
 // * Own components
 import { Header } from './components/Header.jsx';
+import { Controller } from './components/Controller.jsx';
+import { Footer } from './components/Footer.jsx';
+import { Map } from './components/Map.jsx';
 
+// * Gesture controller:
+import { GestureHandlerRootView } from "react-native-gesture-handler";
  
 export default function App() {
 
   return (
-    <View style={styles.container}>
+    <GestureHandlerRootView style={styles.container}>
         <Header />
+        <Map />
+        <Controller />
+        <Footer />
         <StatusBar style="auto" />
-    </View>
+    </GestureHandlerRootView> 
   );
 }
 
