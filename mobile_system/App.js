@@ -1,5 +1,7 @@
-// * React and React Native imports:
+// * React, Redux and React Native imports:
 import { StyleSheet, Text, Platform, StatusBar } from 'react-native';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
 
 // * Own components
 import { Header } from './components/Header.jsx';
@@ -13,13 +15,15 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 export default function App() {
 
   return (
-    <GestureHandlerRootView style={styles.container}>
-        <Header />
-        <Map />
-        <Controller />
-        <Footer />
-        <StatusBar style="auto" />
-    </GestureHandlerRootView> 
+    <Provider store={store}>
+      <GestureHandlerRootView style={styles.container}>
+          <Header />
+          <Map />
+          <Controller />
+          <Footer />
+          <StatusBar style="auto" />
+      </GestureHandlerRootView> 
+    </Provider>
   );
 }
 

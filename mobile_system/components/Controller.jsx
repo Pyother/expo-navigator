@@ -1,5 +1,7 @@
 // * React and React Native imports:
 import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { move } from '../features/DataSlice.js';
 import { 
     View, 
     Text, 
@@ -18,7 +20,33 @@ import { ReactNativeJoystick } from "@korsolutions/react-native-joystick";
 
 export const Controller = () => {
 
+    const dispatch = useDispatch();
+    const data = useSelector(state => state.data);
     const [joystickValue, setJoystickValue] = useState(0);
+
+    const changePostion = (direction) => {
+
+        let radianAngle, deltaX, deltaY;
+
+        if(joystickValue == 0) {
+            deltaX = 0;
+            deltaY = direction;
+        }
+        else {
+            radianAngle = joystickValue * Math.PI / 180; 
+            deltaX = Math.cos(radianAngle) * direction; 
+            deltaY = Math.sin(radianAngle) * direction; 
+        }
+
+        if(data.length == 0) {
+            dispatch(move({x: deltaX, y: deltaY}));
+        } else {
+            const previousPoint = data[data.length - 1];
+            const nextX = previousPoint.x + deltaX;
+            const nextY = previousPoint.y + deltaY;
+            dispatch(move({x: nextX, y: nextY}));
+        }
+    }
 
     return(
         <View style={styles.mainContainerStyle}>
@@ -30,13 +58,13 @@ export const Controller = () => {
                     height: '100%',
                 }}
             >
-                <TouchableOpacity onPress={() => console.log('Button pressed')}>
+                <TouchableOpacity onPress={() => changePostion(1)}>
                     <Icon 
                         style={styles.iconStyle}
                         name="arrow-up-outline" size={40} color="grey" 
                     />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => console.log('Button pressed')}>
+                <TouchableOpacity onPress={() => changePostion(-1)}>
                     <Icon 
                         style={styles.iconStyle}
                         name="arrow-down-outline" size={40} color="grey" 
