@@ -17,10 +17,12 @@ MqttClient mqttClient(wifiClient);
 int status = WL_IDLE_STATUS; // → status of connection.
 
 // ↓ Input/Output:
-#define ENGINE1_BACKWARD A0
-#define ENGINE1_FORWARD A1
-#define ENGINE2_BACKWARD A2
-#define ENGINE2_FORWARD A3
+#define ENGINE1_FORWARD 15 
+#define ENGINE1_BACKWARD 14
+#define ENGINE2_FORWARD 17
+#define ENGINE2_BACKWARD 16
+#define SPEED1 5
+#define SPEED2 6
 
 void setup()
 {
@@ -32,6 +34,8 @@ void setup()
   pinMode(ENGINE1_BACKWARD, OUTPUT);
   pinMode(ENGINE2_FORWARD, OUTPUT);
   pinMode(ENGINE2_BACKWARD, OUTPUT);
+  pinMode(SPEED1, OUTPUT);
+  pinMode(SPEED2, OUTPUT);
 
   // =======================================================
   // ↓ Connection loop.
@@ -99,6 +103,7 @@ void loop()
       int angle = atoi(angleStr);
       rotate(angle);
     }
+
   }
 }
 
@@ -107,22 +112,33 @@ void change_position(int position)
   Serial.println("Position change request.");
   if (position)
   {
-    Serial.println("Positive");
-    digitalWrite(ENGINE1_FORWARD, HIGH);
-    digitalWrite(ENGINE1_BACKWARD, LOW);
-    digitalWrite(ENGINE2_FORWARD, HIGH);
-    digitalWrite(ENGINE2_BACKWARD, LOW);
+    Serial.println("Przód");
 
-    delay(1000);
+    analogWrite(SPEED1, 200);
+    analogWrite(SPEED2, 200);
+
+    digitalWrite(ENGINE1_FORWARD, HIGH);
+    digitalWrite(ENGINE2_FORWARD, HIGH);
+
+    delay(200);
 
     digitalWrite(ENGINE1_FORWARD, LOW);
-    digitalWrite(ENGINE1_BACKWARD, LOW);
     digitalWrite(ENGINE2_FORWARD, LOW);
-    digitalWrite(ENGINE2_BACKWARD, LOW);
   }
   else
   {
-    Serial.println("Negative");
+    Serial.println("Tył");
+
+    analogWrite(SPEED1, 200);
+    analogWrite(SPEED2, 200);
+
+    digitalWrite(ENGINE1_BACKWARD, HIGH);
+    digitalWrite(ENGINE2_BACKWARD, HIGH);
+
+    delay(200);
+
+    digitalWrite(ENGINE1_BACKWARD, LOW);
+    digitalWrite(ENGINE2_BACKWARD, LOW);
   }
 }
 

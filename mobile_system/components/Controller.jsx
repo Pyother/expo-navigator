@@ -1,5 +1,5 @@
 // * React and React Native imports:
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { move } from '../features/DataSlice.js';
 import { 
@@ -18,11 +18,62 @@ import Icon from 'react-native-vector-icons/Ionicons';
 // * Joystick:
 import { ReactNativeJoystick } from "@korsolutions/react-native-joystick";
 
+// * MQTT:
+import init from 'react_native_mqtt';
+import { AsyncStorage } from '@react-native-async-storage/async-storage';
+
+init({
+    size: 10000,
+    storageBackend: AsyncStorage,
+    defaultExpires: 1000 * 3600 * 24,
+    enableCache: true,
+    reconnect: true,
+    sync : {}
+});  
+
 export const Controller = () => {
 
     const dispatch = useDispatch();
     const data = useSelector(state => state.data);
     const [joystickValue, setJoystickValue] = useState(0);
+    const [client, setClient] = useState(null);
+
+    useEffect(() => {
+        // Create MQTT client
+        const mqttClient = new Paho.MQTT.Client('test.mosquitto.org', 8080, 'clientId');
+
+        mqttClient.onConnectionLost = (responseObject) => {
+            if (responseObject.errorCode !== 0) {
+                console.log('onConnectionLost:', responseObject.errorMessage);
+            }
+        };
+
+        mqttClient.onMessageArrived = (message) => {
+            console.log('onMessageArrived:', message.payloadString);
+        };
+
+        mqttClient.connect({
+            onSuccess: () => {
+                console.log('connected');
+                mqttClient.subscribe('myTopic');
+                const message = new Paho.MQTT.Message('Hello mqtt');
+                message.destinationName = 'myTopic';
+                mqttClient.send(message);
+            },
+            onFailure: (error) => {
+                console.log('connect failed', error);
+            }
+        });
+
+        setClient(mqttClient);
+
+        // Clean up the effect
+        return () => {
+            if (mqttClient) {
+                mqttClient.disconnect();
+            }
+        };
+    }, []);
 
     const changePostion = (direction) => {
 
