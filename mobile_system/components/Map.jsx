@@ -153,7 +153,7 @@ export const Map = () => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 0.75,
         justifyContent: 'center',
         alignItems: 'center',
         width: Dimensions.get('window').width - 40,

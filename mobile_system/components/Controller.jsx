@@ -14,6 +14,7 @@ import { Chip } from '@rneui/themed';
 
 // * Icons:
 import Icon from 'react-native-vector-icons/Ionicons'; 
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // * Joystick:
 import { ReactNativeJoystick } from "@korsolutions/react-native-joystick";
@@ -36,38 +37,35 @@ export const Controller = () => {
     const dispatch = useDispatch();
     const data = useSelector(state => state.data);
     const [joystickValue, setJoystickValue] = useState(0);
+    const [selectedValue, setSelectedValue] = useState(0);
     const [client, setClient] = useState(null);
 
     useEffect(() => {
-        // Create MQTT client
+        
         const mqttClient = new Paho.MQTT.Client('test.mosquitto.org', 8080, 'clientId');
 
         mqttClient.onConnectionLost = (responseObject) => {
             if (responseObject.errorCode !== 0) {
-                console.log('onConnectionLost:', responseObject.errorMessage);
+                console.log('Connection lost → ', responseObject.errorMessage);
             }
         };
 
         mqttClient.onMessageArrived = (message) => {
-            console.log('onMessageArrived:', message.payloadString);
+            console.log('Message → ', message.payloadString);
         };
 
         mqttClient.connect({
             onSuccess: () => {
-                console.log('connected');
-                mqttClient.subscribe('myTopic');
-                const message = new Paho.MQTT.Message('Hello mqtt');
-                message.destinationName = 'myTopic';
-                mqttClient.send(message);
+                console.log('Connected');
+                mqttClient.subscribe('RTLSSystems');
             },
             onFailure: (error) => {
-                console.log('connect failed', error);
+                console.log('Connection failed → ', error);
             }
         });
 
         setClient(mqttClient);
 
-        // Clean up the effect
         return () => {
             if (mqttClient) {
                 mqttClient.disconnect();
@@ -77,14 +75,20 @@ export const Controller = () => {
 
     const changePostion = (direction) => {
 
+        let message;
+        if(direction === -1) message = new Paho.MQTT.Message(`reqp0`);
+        else message = new Paho.MQTT.Message(`reqp${direction}`);
+        message.destinationName = "RTLSSystems";
+        client.send(message);
+
         let radianAngle, deltaX, deltaY;
 
-        if(joystickValue == 0) {
+        if(selectedValue == 0) {
             deltaX = 0;
             deltaY = direction;
         }
         else {
-            radianAngle = joystickValue * Math.PI / 180; 
+            radianAngle = selectedValue * Math.PI / 180; 
             deltaX = Math.cos(radianAngle) * direction; 
             deltaY = Math.sin(radianAngle) * direction; 
         }
@@ -110,15 +114,15 @@ export const Controller = () => {
                 }}
             >
                 <TouchableOpacity onPress={() => changePostion(1)}>
-                    <Icon 
+                    <Icon
                         style={styles.iconStyle}
-                        name="arrow-up-outline" size={40} color="grey" 
+                        name="arrow-up-outline" size={30} color="grey" 
                     />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => changePostion(-1)}>
                     <Icon 
                         style={styles.iconStyle}
-                        name="arrow-down-outline" size={40} color="grey" 
+                        name="arrow-down-outline" size={30} color="grey" 
                     />
                 </TouchableOpacity>
             </View>
@@ -132,19 +136,48 @@ export const Controller = () => {
                         }} 
                     />
                 </View>
-                <Text>Kąt obrotu</Text>
+                <Text>Wybrany kąt</Text>
                 <View style={styles.infoContainerStyle}>
+                    <MaterialCommunityIcons 
+                        name="angle-acute" 
+                        size={30} 
+                        color="grey" 
+                    />
                     <TextInput
                         editable={false}
                         value={`${joystickValue}°`}
                         style={styles.textInputStyle}
                     />
-                    <TouchableOpacity onPress={() => {console.log("Angle send")}}>
+                    <TouchableOpacity onPress={() => {
+                        let message = new Paho.MQTT.Message(`reqr${joystickValue}`);
+                        message.destinationName = "RTLSSystems";
+                        client.send(message);
+                        setSelectedValue(joystickValue);
+                    }}>
                         <Icon 
-                            style={styles.iconStyle}
-                            name="send-outline" size={40} color="grey" 
+                            style={{
+                                backgroundColor: 'rgb(246, 244, 245)',
+                                borderRadius: 5,
+                                padding: 5,
+                                marginLeft: 10,
+                                marginRight: 10
+                            }}
+                            name="send-outline" size={30} color="grey" 
                         />
                     </TouchableOpacity>
+                </View>
+                <Text>Ustawiony kąt</Text> 
+                <View style={styles.infoContainerStyle}>
+                    <MaterialCommunityIcons 
+                        name="bullseye-arrow" 
+                        size={30} 
+                        color="grey" 
+                    />
+                    <TextInput
+                        editable={false}
+                        value={`${selectedValue}°`}
+                        style={styles.angleInfoStyle}
+                    />
                 </View>
             </View>
         </View>
@@ -166,6 +199,9 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     iconStyle: {
+        backgroundColor: 'rgb(246, 244, 245)',
+        borderRadius: 5,
+        padding: 5,
         margin: 10
     }, 
     textInputStyle: {
@@ -176,7 +212,8 @@ const styles = StyleSheet.create({
         color: 'black',
         backgroundColor: 'rgb(246, 244, 245)',
         borderRadius: 5,
-        margin: 5,
+        marginLeft: 10,
+        height: 40
     }, 
     joystickContainerStyle: {
         flex: 1,
@@ -184,7 +221,21 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     infoContainerStyle: {
+        justifyContent: 'center',
+        alignItems: 'center',
         flexDirection: 'row',
         margin: 10,
     },
+    angleInfoStyle: {
+        flex: 1,
+        textAlign: 'center',
+        fontSize: 24,
+        fontFamily: 'monospace',
+        color: 'black',
+        backgroundColor: 'rgb(246, 244, 245)',
+        borderRadius: 5,
+        marginLeft: 10,
+        marginRight: 10,
+        height: 40
+    }
 });
