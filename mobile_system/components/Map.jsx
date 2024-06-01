@@ -6,59 +6,46 @@ import { StyleSheet, View, Dimensions } from 'react-native';
 import { PanGestureHandler, PinchGestureHandler, State } from 'react-native-gesture-handler';
 
 export const Map = () => {
+    
     const data = useSelector(state => state.data);
     const cameraRef = useRef(null);
     const rendererRef = useRef(null);
     const lastDrag = useRef({ x: 0, y: 0 });
     const lastScale = useRef(1);
-    const cubeRef = useRef(null); // Reference to the cube
-    const sceneRef = useRef(null); // Reference to the scene
-    const previousPositionRef = useRef(null); // Reference to the previous position of the cube
-    const processedPointsRef = useRef(0); // Number of points already processed
+    const cubeRef = useRef(null);
+    const sceneRef = useRef(null); 
+    const previousPositionRef = useRef(null); 
+    const processedPointsRef = useRef(0); 
 
     const onContextCreate = async (gl) => {
-        // Create a Three.js renderer
+
         const renderer = new Renderer({ gl });
         renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight);
         renderer.setClearColor(0xf6f4f5, 1);
         rendererRef.current = renderer;
 
-        // Create a new Three.js scene
         const scene = new THREE.Scene();
         sceneRef.current = scene;
 
-        // Create a camera and position it
         const camera = new THREE.PerspectiveCamera(75, gl.drawingBufferWidth / gl.drawingBufferHeight, 0.1, 1000);
         camera.position.z = 8;
         camera.position.y = 2;
         camera.position.x = 0;
         cameraRef.current = camera;
 
-        // Add an ambient light to the scene
         const ambientLight = new THREE.AmbientLight(0x404040);
         scene.add(ambientLight);
 
-        // Create a cube and add it to the scene
         const geometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial({ color: 0xa0e2f2 });
+        const material = new THREE.MeshBasicMaterial({ color: 0x9089c9 });
         const cube = new THREE.Mesh(geometry, material);
         scene.add(cube);
-        cubeRef.current = cube; // Save reference to the cube
-
-        // Set initial position for previousPositionRef
+        cubeRef.current = cube; 
         previousPositionRef.current = cube.position.clone();
 
-        // Animation loop
         const animate = () => {
             requestAnimationFrame(animate);
-
-            // Rotate the cube
-            cube.rotation.y += 0.01;
-
-            // Render the scene
             renderer.render(scene, camera);
-
-            // End the frame
             gl.endFrameEXP();
         };
 
@@ -66,7 +53,6 @@ export const Map = () => {
     };
 
     useEffect(() => {
-        // Move the cube based on data
         if (cubeRef.current && data && data.length > 0) {
             for (let i = processedPointsRef.current; i < data.length; i++) {
                 const point = data[i];
@@ -82,8 +68,7 @@ export const Map = () => {
     }, [data]);
 
     const createLine = (start, end) => {
-        // Create a line from previous position to current position
-        const lineMaterial = new THREE.LineBasicMaterial({ color: 0x0000ff, linewidth: 5 }); // Change color and line width
+        const lineMaterial = new THREE.LineBasicMaterial({ color: 0x364182, linewidth: 5 }); 
         const points = [start, end];
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
         const line = new THREE.Line(geometry, lineMaterial);
@@ -113,7 +98,7 @@ export const Map = () => {
 
         if (cameraRef.current) {
             const newFov = cameraRef.current.fov / deltaScale;
-            cameraRef.current.fov = Math.max(30, Math.min(100, newFov)); // Clamp FOV between 30 and 100
+            cameraRef.current.fov = Math.max(30, Math.min(100, newFov)); 
             cameraRef.current.updateProjectionMatrix();
         }
     };

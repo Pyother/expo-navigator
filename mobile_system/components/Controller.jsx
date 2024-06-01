@@ -129,7 +129,7 @@ export const Controller = () => {
             <View style={styles.containerStyle}>
                 <View style={styles.joystickContainerStyle}>
                     <ReactNativeJoystick 
-                        color="#a0e2f2" 
+                        color="#9089c9" 
                         radius={75}     
                         onMove={(data) => {
                             setJoystickValue(Math.round(data.angle.degree));

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "mobile_system",
-    "slug": "mobile_system",
+    "name": "ExpoNavigator",
+    "slug": "ExpoNavigator",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -12,17 +12,33 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.ExpoNavigator"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.mobile_system"
+      "package": "com.anonymous.ExpoNavigator"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/1ba3f9d9-da59-43ad-818f-7f2660746e97"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "1ba3f9d9-da59-43ad-818f-7f2660746e97"
+      }
+    },
+    "owner": "pyother",
+    "plugins": [
+      "expo-font"
+    ]
   }
 }
