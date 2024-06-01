@@ -19,6 +19,7 @@ MqttClient mqttClient(wifiClient);
 
 // ↓ Global variables:
 int status = WL_IDLE_STATUS; // → status of connection.
+int angle;
 
 void setup() {
 
@@ -60,10 +61,48 @@ void setup() {
 
 void loop() {
 
-  int value = analogRead(JOYSTICK2Y);
+  int joystick1 = analogRead(JOYSTICK1);
+  int joystick2_x = analogRead(JOYSTICK2X);
+  int joystick2_y = analogRead(JOYSTICK2Y);
   
-  Serial.println(value);
+  // ↓ Joystick conditions:
+  if (joystick2_y > 800 && joystick2_x < 800 && joystick2_x > 200) { angle = 0; }
+  if (joystick2_y > 800 && joystick2_x > 800) { angle = 45; }
+  if (joystick2_y < 800 && joystick2_y > 200 && joystick2_x > 800) { angle = 90; }
+  if (joystick2_y < 200 && joystick2_x > 800) { angle = 135; }
+  if (joystick2_y < 200 && joystick2_x < 800 && joystick2_x > 200) { angle = 180; }
+  if (joystick2_y < 200 && joystick2_x < 200) { angle = 225; }
+  if (joystick2_y > 200 && joystick2_y < 800 && joystick2_x < 200) { angle = 270; }
+  if (joystick2_y > 800 && joystick2_x < 200) { angle = 315; }
 
-  delay(50);
+  if(angle != 0) {
+    String message = "reqr" + String(angle);
+    mqttClient.beginMessage(MQTT_TOPIC);
+    mqttClient.print(message);
+    mqttClient.endMessage();
+    Serial.print("Sent message: ");
+    Serial.println(message);
+  }
 
+  if(joystick1 > 800) {
+    String message = "reqp" + String(1);
+    mqttClient.beginMessage(MQTT_TOPIC);
+    mqttClient.print(message);
+    mqttClient.endMessage();
+    Serial.print("Sent message: ");
+    Serial.println(message);
+  }
+
+  if(joystick1 < 200) {
+    String message = "reqp" + String(0);
+    mqttClient.beginMessage(MQTT_TOPIC);
+    mqttClient.print(message);
+    mqttClient.endMessage();
+    Serial.print("Sent message: ");
+    Serial.println(message);
+  }
+  
+  delay(300);
+
+  angle = 0;
 }
